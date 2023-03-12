@@ -55,7 +55,7 @@ int main() {
 
     // Open the report file
     ofstream fo;
-    fo.open("HeapSort_report.txt");
+    fo.open("Heap_report.txt");
 
     // Loop through every single test
     for (char i = '0'; i < ':'; i++) { // i is the test index
