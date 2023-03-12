@@ -10,57 +10,40 @@ using namespace std;
 // begin is for left index and end is
 // right index of the sub-array
 // of array to be sorted
-// stk is the auxilliary stack
-void quickSort(long arr[], long stk[], long begin, long end) {
+void quickSort(long arr[], long begin, long end) {
     // Choose the leftmost element as the pivot
 
-    // Initialize top of stack
-    long top = -1;
+    if (begin >= end) { // Nothing to sort here
+        return;
+    }
+
+    // Initialize index of the "high" sub-array, traversing backward
+    long firstOfHigh = end + 1; 
     
-    // Push initial values of begin and end to stack
-    stk[++top] = begin;
-    stk[++top] = end;
-
-    // Keep popping stack until it is empty
-    while (top > -1) {
-        // Pop begin and end
-        end = stk[top--];
-        begin = stk[top--];
-
-        if (begin >= end) { // Nothing to sort here
+    // traverse the "low" sub-array forward
+    for (long lastOfLow = begin + 1; lastOfLow < firstOfHigh; lastOfLow++) {
+        // find the first "high" element
+        if (arr[lastOfLow] < arr[begin]) {
             continue;
         }
 
-        // Initialize index of the "high" sub-array, traversing backward
-        long firstOfHigh = end + 1; 
-        
-        // traverse the "low" sub-array forward
-        for (long lastOfLow = begin + 1; lastOfLow < firstOfHigh; lastOfLow++) {
-            // find the first "high" element
-            if (arr[lastOfLow] < arr[begin]) {
-                continue;
-            }
-
-            // find the last "low" element and swap its value with the "high" element
-            while (firstOfHigh > lastOfLow) {
-                firstOfHigh--;
-                if (arr[firstOfHigh] < arr[begin]) {
-                    swap(arr[lastOfLow], arr[firstOfHigh]);
-                    break;
-                }
+        // find the last "low" element and swap its value with the "high" element
+        while (firstOfHigh > lastOfLow) {
+            firstOfHigh--;
+            if (arr[firstOfHigh] < arr[begin]) {
+                swap(arr[lastOfLow], arr[firstOfHigh]);
+                break;
             }
         }
-        
-        // Now arr[firstOfHigh] is the first element of the "high" sub-array
-        // pivot should be at index firstOfHigh - 1
-        swap(arr[begin], arr[firstOfHigh - 1]);
-        
-        // Push begins and ends of the sub-arrays to stack
-        stk[++top] = begin;
-        stk[++top] = firstOfHigh - 2;
-        stk[++top] = firstOfHigh;
-        stk[++top] = end;
     }
+    
+    // Now arr[firstOfHigh] is the first element of the "high" sub-array
+    // pivot should be at index firstOfHigh - 1
+    swap(arr[begin], arr[firstOfHigh - 1]);
+
+    // Sort the sub-arrays
+    quickSort(arr, begin, firstOfHigh - 2);
+    quickSort(arr, firstOfHigh, end);
 }
 
 int main() {
@@ -68,10 +51,10 @@ int main() {
 
     // Open the report file
     ofstream fo;
-    fo.open("Quick_report.txt");
+    fo.open("QuickSort_report.txt");
 
     // Loop through every single test
-    for (char i = '0'; i < '2'; i++) { // i is the test index
+    for (char i = '2'; i < ':'; i++) { // i is the test index
         // array to store the numbers in test i
         long *numarr = new long[n] ;
         
@@ -86,9 +69,7 @@ int main() {
         
         // Measure the time
         auto start = chrono::high_resolution_clock::now(); // start time
-        long *stk = new long[n * 2]; // auxilliary stack
-        quickSort(numarr, stk, 0, n - 1); // sorting
-        delete[] stk;
+        quickSort(numarr, 0, n - 1); // sorting
         auto end = chrono::high_resolution_clock::now(); // end time 
         chrono::duration<double> duration = end - start; // calculate duration 
         
