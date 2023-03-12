@@ -77,7 +77,7 @@ int main() {
 
     // Open the report file
     ofstream fo;
-    fo.open("MergeSort_report.txt");
+    fo.open("Merge_report.txt");
 
     // Loop through every single test
     for (char i = '0'; i < ':'; i++) { // i is the test index
