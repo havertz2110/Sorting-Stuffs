@@ -1,52 +1,65 @@
 #include <chrono>
 #include <fstream>
-#include <algorithm>
 #include <string>
+#include <algorithm>
 
 #define n 1000000
 
 using namespace std;
 
-// To heapify a subtree rooted with node i
-// which is an index in arr.
-// n is size of heap
-void heapify(long arr[], long N, long i)
-{
-    // Find largest among root, left child and right child
- 
-    long largest = i; // Initialize largest as root
-    long left = 2 * i + 1; // left = 2*i + 1
-    long right = 2 * i + 2; // right = 2*i + 2
+// begin is for left index and end is
+// right index of the sub-array
+// of array to be sorted
+// stk is the auxilliary stack
+void quickSort(long arr[], long stk[], long begin, long end) {
+    // Choose the leftmost element as the pivot
+
+    // Initialize top of stack
+    long top = -1;
     
-    // If left child is larger than root
-    if (left < N && arr[left] > arr[largest]) { 
-        largest = left;
-    }
-    
-    // If right child is larger than largest so far
-    if (right < N && arr[right] > arr[largest]) { 
-        largest = right; 
-    }
- 
-    // Swap and continue heapifying if root is not largest
-    if (largest != i) { // If largest is not root
-        swap(arr[i], arr[largest]);
-        heapify(arr, N, largest); // Recursively heapify the affected sub-tree
-    }
-}
- 
-// Main function to do heap sort
-void heapSort(long arr[], long N)
-{
-    // Build max heap
-    for (long i = N / 2 - 1; i >= 0; i--) {
-        heapify(arr, N, i);
-    }
-    
-    // Heap sort
-    for (long i = N - 1; i >= 0; i--) { 
-        swap(arr[0], arr[i]);
-        heapify(arr, i, 0); // Heapify root element to get highest element at root again
+    // Push initial values of begin and end to stack
+    stk[++top] = begin;
+    stk[++top] = end;
+
+    // Keep popping stack until it is empty
+    while (top > -1) {
+        // Pop begin and end
+        end = stk[top--];
+        begin = stk[top--];
+
+        if (begin >= end) { // Nothing to sort here
+            continue;
+        }
+
+        // Initialize index of the "high" sub-array, traversing backward
+        long firstOfHigh = end + 1; 
+        
+        // traverse the "low" sub-array forward
+        for (long lastOfLow = begin + 1; lastOfLow < firstOfHigh; lastOfLow++) {
+            // find the first "high" element
+            if (arr[lastOfLow] < arr[begin]) {
+                continue;
+            }
+
+            // find the last "low" element and swap its value with the "high" element
+            while (firstOfHigh > lastOfLow) {
+                firstOfHigh--;
+                if (arr[firstOfHigh] < arr[begin]) {
+                    swap(arr[lastOfLow], arr[firstOfHigh]);
+                    break;
+                }
+            }
+        }
+        
+        // Now arr[firstOfHigh] is the first element of the "high" sub-array
+        // pivot should be at index firstOfHigh - 1
+        swap(arr[begin], arr[firstOfHigh - 1]);
+        
+        // Push begins and ends of the sub-arrays to stack
+        stk[++top] = begin;
+        stk[++top] = firstOfHigh - 2;
+        stk[++top] = firstOfHigh;
+        stk[++top] = end;
     }
 }
 
@@ -55,10 +68,10 @@ int main() {
 
     // Open the report file
     ofstream fo;
-    fo.open("HeapSort_report.txt");
+    fo.open("IterativeQuickSort_report.txt");
 
     // Loop through every single test
-    for (char i = '0'; i < ':'; i++) { // i is the test index
+    for (char i = '0'; i < '2'; i++) { // i is the test index
         // array to store the numbers in test i
         long *numarr = new long[n] ;
         
@@ -73,7 +86,9 @@ int main() {
         
         // Measure the time
         auto start = chrono::high_resolution_clock::now(); // start time
-        heapSort(numarr, n); // sorting
+        long *stk = new long[n * 2]; // auxilliary stack
+        quickSort(numarr, stk, 0, n - 1); // sorting
+        delete[] stk;
         auto end = chrono::high_resolution_clock::now(); // end time 
         chrono::duration<double> duration = end - start; // calculate duration 
         
