@@ -68,7 +68,7 @@ int main() {
 
     // Open the report file
     ofstream fo;
-    fo.open("IterativeQuickSort_report.txt");
+    fo.open("Quick_report.txt");
 
     // Loop through every single test
     for (char i = '0'; i < '2'; i++) { // i is the test index
